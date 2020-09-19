@@ -27,8 +27,9 @@ i = 0
 while i == 0:
     res = os.system("ncat -vnzu "+UDP_IP+" "+UDP_PORT_STR)
     if res == 0:
+        continue
     else:
-        i = 1
+     i = 1
 
 
 if sys.argv[1] == "discover":
