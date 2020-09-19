@@ -111,6 +111,7 @@ pKey = "00000000000000000000000000000000"
 
 
 if sys.argv[1] == "discover":
+    print "Start discover command for device name " + sys.argv[4]
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.bind((UDP_IP, UDP_PORT))
     while True:

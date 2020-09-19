@@ -179,7 +179,7 @@ function SwitcherBoiler(log, config, api) {
             this.cachedConfig = await storage.getItem('switcher_config')
         } catch (err) {
             this.log("Failed setting storage dir under 'switcher-persist':")
-            this.log(err)
+            this.log(err);
             this.log("Please contact the plugin creator...")
         }
 
