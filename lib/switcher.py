@@ -10,6 +10,7 @@ import sys
 import os
 import re
 import signal
+import errno
 
 switcherIP = sys.argv[2]
 phone_id = "0000"
@@ -24,9 +25,21 @@ ip = "127.0.0.1"
 port = "<some_udp_port>"
 i = 0
 
+
+def is_port_in_use(p):
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        s.bind((UDP_IP, UDP_PORT))
+        return False
+    except socket.error as e:
+        if e.errno == errno.EADDRINUSE:
+            return True
+        else:
+            return False
+
+
 while i == 0:
-    res = os.system("ncat -vnzu "+UDP_IP+" "+UDP_PORT_STR)
-    if res == 0:
+    if is_port_in_use(UDP_PORT):
         continue
     else:
      i = 1
@@ -124,7 +137,6 @@ pKey = "00000000000000000000000000000000"
 
 
 if sys.argv[1] == "discover":
-    print "Start discover command for device name " + sys.argv[4]
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.bind((UDP_IP, UDP_PORT))
     while True:
