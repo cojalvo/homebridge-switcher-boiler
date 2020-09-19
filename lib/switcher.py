@@ -118,7 +118,7 @@ if sys.argv[1] == "discover":
         if ba.hexlify(data)[0:4] != "fef0" and len(data) != 165:
             print("{ \"status\": \"failed\", \"message\": \"Not a switcher broadcast message!\" }")
         else:
-            if data.find(sys.argv[2]) == -1:
+            if data.find(sys.argv[4]) == -1:
                 continue
         b = ba.hexlify(data)[152:160]
         ip_addr = int(b[6:8] + b[4:6] + b[2:4] + b[0:2], 16)
@@ -129,94 +129,93 @@ if sys.argv[1] == "discover":
 
 else:
 
-try:
-
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect((switcherIP, 9957))
-    data = "fef052000232a100" + pSession + "340001000000000000000000" + getTS().decode(
-        'utf-8') + "00000000000000000000f0fe1c00" + phone_id + "0000" + device_pass + "00000000000000000000000000000000000000000000000000000000"
-    data = crcSignFullPacketComKey(data, pKey)
-    s.send(ba.unhexlify(data))
-    res = s.recv(1024)
-    pSession2 = ba.hexlify(res)[16:24]
-    if not pSession2:
-        s.close()
-        print(
-            "{ \"status\": \"failed\", \"message\": \"Operation failed, Could not acquire SessionID, Please try again...\" }")
-        sys.exit()
-
-    data = "fef0300002320103" + pSession2.decode("utf-8") + "340001000000000000000000" + getTS().decode(
-        'utf-8') + "00000000000000000000f0fe" + device_id + "00"
-    data = crcSignFullPacketComKey(data, pKey)
-    s.send(ba.unhexlify(data))
-    res = s.recv(1024)
-    deviceName = res[40:72].decode('utf-8')
-    state = ba.hexlify(res)[150:154].decode('utf-8')
-    if sys.argv[1] == "setOff" and state == "0000":
-        s.close()
-        print ("{ \"status\": \"success\", \"message\": \"Device is already OFF\" }")
-        sys.exit()
-    elif sys.argv[1] == "setOn" and state == "0100":
-        s.close()
-        print ("{ \"status\": \"success\", \"message\": \"Device is already ON\" }")
-        sys.exit()
-    elif sys.argv[1] == "getState" and state == "0100":
-        s.close()
-        print ("{ \"status\": \"success\", \"power\": \"on\", " + getPower(res) + getAutoClose(res) + sTime(res) + " }")
-        sys.exit()
-    elif sys.argv[1] == "getState" and state == "0000":
-        s.close()
-        print ("{ \"status\": \"success\", \"power\": \"off\", " + getPower(res) + getAutoClose(res) + sTime(
-            res) + " }")
-        sys.exit()
-    elif sys.argv[1].startswith('t'):
-        try:
-            sMinutes = int(sys.argv[1][1:])
-        except:
-            print("{ \"status\": \"failed\", \"message\": \"" + sys.argv[1][1:] + " Is not a valid number!\" }")
-            sys.exit()
-        if sMinutes > 0 and sMinutes <= 60:
-            data = "fef05d0002320102" + pSession2 + "340001000000000000000000" + getTS().decode(
-                'utf-8') + "00000000000000000000f0fe" + device_id + "00" + phone_id + "0000" + device_pass + "000000000000000000000000000000000000000000000000000000000106000100" + sTimer(
-                sMinutes)
-            data = crcSignFullPacketComKey(data, pKey)
-            s.send(ba.unhexlify(data))
-            res = s.recv(1024)
-            print("{ \"status\": \"success\", \"message\": \"Turning Switcher ON for " + str(
-                sMinutes) + " minutes...\" }")
-            s.close()
-        else:
-            print("{ \"status\": \"failed\", \"message\": \"Enter a value between 1-60 minutes\" }")
-            sys.exit()
-    elif sys.argv[1].startswith('m'):
-        if not hourRe.match(sys.argv[1][1:]):
-            print("{ \"status\": \"failed\", \"message\": \"Please enter a value between 01:00 - 23:59\" }")
-            sys.exit()
-
-        else:
-            auto_close = setAutoClose(sys.argv[1][1:])
-            data = "fef05b0002320102" + pSession2 + "340001000000000000000000" + getTS().decode(
-                'utf-8') + "00000000000000000000f0fe" + device_id + "00" + phone_id + "0000" + device_pass + "00000000000000000000000000000000000000000000000000000000040400" + auto_close.decode(
-                'utf-8')
-            data = crcSignFullPacketComKey(data, pKey)
-            s.send(ba.unhexlify(data))
-            res = s.recv(1024)
-            print ("{\"message\": \"Auto shutdown was set to " + sys.argv[1][1:] + "\", ")
-            s.close()
-    else:
-        data = "fef05d0002320102" + pSession2.decode('utf-8') + "340001000000000000000000" + getTS().decode(
-            'utf-8') + "00000000000000000000f0fe" + device_id + "00" + phone_id + "0000" + device_pass + "000000000000000000000000000000000000000000000000000000000106000" + sCommand + "0000000000"
+    try:
+        s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        s.connect((switcherIP, 9957))
+        data = "fef052000232a100" + pSession + "340001000000000000000000" + getTS().decode(
+            'utf-8') + "00000000000000000000f0fe1c00" + phone_id + "0000" + device_pass + "00000000000000000000000000000000000000000000000000000000"
         data = crcSignFullPacketComKey(data, pKey)
         s.send(ba.unhexlify(data))
         res = s.recv(1024)
+        pSession2 = ba.hexlify(res)[16:24]
+        if not pSession2:
+            s.close()
+            print(
+                "{ \"status\": \"failed\", \"message\": \"Operation failed, Could not acquire SessionID, Please try again...\" }")
+            sys.exit()
 
-        if sCommand == "0":
-            print ("{ \"message\": \"Sending OFF Command to Switcher\", ")
-        elif sCommand == "1":
-            print ("{ \"message\": \"Sending ON Command to Switcher\", ")
+        data = "fef0300002320103" + pSession2.decode("utf-8") + "340001000000000000000000" + getTS().decode(
+            'utf-8') + "00000000000000000000f0fe" + device_id + "00"
+        data = crcSignFullPacketComKey(data, pKey)
+        s.send(ba.unhexlify(data))
+        res = s.recv(1024)
+        deviceName = res[40:72].decode('utf-8')
+        state = ba.hexlify(res)[150:154].decode('utf-8')
+        if sys.argv[1] == "setOff" and state == "0000":
+            s.close()
+            print ("{ \"status\": \"success\", \"message\": \"Device is already OFF\" }")
+            sys.exit()
+        elif sys.argv[1] == "setOn" and state == "0100":
+            s.close()
+            print ("{ \"status\": \"success\", \"message\": \"Device is already ON\" }")
+            sys.exit()
+        elif sys.argv[1] == "getState" and state == "0100":
+            s.close()
+            print ("{ \"status\": \"success\", \"power\": \"on\", " + getPower(res) + getAutoClose(res) + sTime(res) + " }")
+            sys.exit()
+        elif sys.argv[1] == "getState" and state == "0000":
+            s.close()
+            print ("{ \"status\": \"success\", \"power\": \"off\", " + getPower(res) + getAutoClose(res) + sTime(
+                res) + " }")
+            sys.exit()
+        elif sys.argv[1].startswith('t'):
+            try:
+                sMinutes = int(sys.argv[1][1:])
+            except:
+                print("{ \"status\": \"failed\", \"message\": \"" + sys.argv[1][1:] + " Is not a valid number!\" }")
+                sys.exit()
+            if sMinutes > 0 and sMinutes <= 60:
+                data = "fef05d0002320102" + pSession2 + "340001000000000000000000" + getTS().decode(
+                    'utf-8') + "00000000000000000000f0fe" + device_id + "00" + phone_id + "0000" + device_pass + "000000000000000000000000000000000000000000000000000000000106000100" + sTimer(
+                    sMinutes)
+                data = crcSignFullPacketComKey(data, pKey)
+                s.send(ba.unhexlify(data))
+                res = s.recv(1024)
+                print("{ \"status\": \"success\", \"message\": \"Turning Switcher ON for " + str(
+                    sMinutes) + " minutes...\" }")
+                s.close()
+            else:
+                print("{ \"status\": \"failed\", \"message\": \"Enter a value between 1-60 minutes\" }")
+                sys.exit()
+        elif sys.argv[1].startswith('m'):
+            if not hourRe.match(sys.argv[1][1:]):
+                print("{ \"status\": \"failed\", \"message\": \"Please enter a value between 01:00 - 23:59\" }")
+                sys.exit()
 
-        s.close()
-    print("\"status\": \"success\" }")
+            else:
+                auto_close = setAutoClose(sys.argv[1][1:])
+                data = "fef05b0002320102" + pSession2 + "340001000000000000000000" + getTS().decode(
+                    'utf-8') + "00000000000000000000f0fe" + device_id + "00" + phone_id + "0000" + device_pass + "00000000000000000000000000000000000000000000000000000000040400" + auto_close.decode(
+                    'utf-8')
+                data = crcSignFullPacketComKey(data, pKey)
+                s.send(ba.unhexlify(data))
+                res = s.recv(1024)
+                print ("{\"message\": \"Auto shutdown was set to " + sys.argv[1][1:] + "\", ")
+                s.close()
+        else:
+            data = "fef05d0002320102" + pSession2.decode('utf-8') + "340001000000000000000000" + getTS().decode(
+                'utf-8') + "00000000000000000000f0fe" + device_id + "00" + phone_id + "0000" + device_pass + "000000000000000000000000000000000000000000000000000000000106000" + sCommand + "0000000000"
+            data = crcSignFullPacketComKey(data, pKey)
+            s.send(ba.unhexlify(data))
+            res = s.recv(1024)
 
-except Exception as e:
-    print("{ \"status\": \"failed\", \"message\": \"" + str(e) + "\" }")
+            if sCommand == "0":
+                print ("{ \"message\": \"Sending OFF Command to Switcher\", ")
+            elif sCommand == "1":
+                print ("{ \"message\": \"Sending ON Command to Switcher\", ")
+
+            s.close()
+        print("\"status\": \"success\" }")
+
+    except Exception as e:
+        print("{ \"status\": \"failed\", \"message\": \"" + str(e) + "\" }")
