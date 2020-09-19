@@ -18,6 +18,18 @@ device_pass = "00000000"
 
 UDP_IP = "0.0.0.0"
 UDP_PORT = 20002
+UDP_PORT_STR = "20002"
+
+ip = "127.0.0.1"
+port = "<some_udp_port>"
+i = 0
+
+while i == 0:
+    res = os.system("ncat -vnzu "+UDP_IP+" "+UDP_PORT_STR)
+    if res == 0:
+    else:
+        i = 1
+
 
 if sys.argv[1] == "discover":
     sCommand = "3"
@@ -111,6 +123,7 @@ pKey = "00000000000000000000000000000000"
 
 
 if sys.argv[1] == "discover":
+    print "Start discover command for device name " + sys.argv[4]
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     sock.bind((UDP_IP, UDP_PORT))
     while True:
