@@ -45,6 +45,12 @@
                 "type": "string",
                 "required": false
             },
+            "switcherIp": {
+                "title": "Switcher IP",
+                "description": "The IP address of the switcher device.",
+                "type": "string",
+                "required": false
+            },
             "debug": {
                 "title": "Enable Debug Logs",
                 "description": "When checked, the plugin will produce extra logs for debugging purposes",

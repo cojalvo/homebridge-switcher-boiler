@@ -110,6 +110,8 @@ if sys.argv[1] == "discover":
 		if ba.hexlify(data)[0:4] != "fef0" and len(data) != 165:
 			print("{ \"status\": \"failed\", \"message\": \"Not a switcher broadcast message!\" }")
 		else:
+		    if data.find(sys.argv[2]) == -1:
+                continue
 			b = ba.hexlify(data)[152:160]
 			ip_addr = int(b[6:8] + b[4:6] + b[2:4] + b[0:2] , 16)
 			device_id = ba.hexlify(data)[36:42].decode('utf-8')
