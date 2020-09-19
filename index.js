@@ -16,6 +16,7 @@ function SwitcherBoiler(log, config, api) {
     let UUIDGen = api.hap.uuid
 
     this.log = log
+    console.log(`Switcher plugin started for device ${config.switcherName}`);
     this.name = config['name'] || 'Switcher'
     this.displayName = this.name
     this.accessoryType = config['accessoryType'] || 'switch'
