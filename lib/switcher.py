@@ -35,7 +35,7 @@ def is_port_in_use(p):
         if e.errno == errno.EADDRINUSE:
             return True
         else:
-            return False
+            return True
 
 
 while i == 0:
