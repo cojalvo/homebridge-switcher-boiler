@@ -32,6 +32,7 @@ function SwitcherBoiler(log, config, api) {
     this.timer = null
     this.remainingDuration = 0
     this.api = api
+    this.discoverWait = config.discoverWait || 1000;
 
     this.accessoryType = this.accessoryType.toLowerCase()
     if (this.accessoryType !== 'switch' && this.accessoryType !== 'outlet' && this.accessoryType !== 'valve')
@@ -172,6 +173,8 @@ function SwitcherBoiler(log, config, api) {
 
     this.discoverDevices = async () => {
         try {
+            this.log(`Waiting before discover ${this.discoverWait}`);
+            await wait(this.discoverWait);
             await storage.init({
                 dir: this.persistPath,
                 forgiveParseErrors: true
@@ -457,4 +460,10 @@ SwitcherBoiler.prototype.setDuration = async function (time, callback) {
 
 const isBelowErrorRepeatLimit = () => {
     return errorRepeatCounter < 2
+}
+
+const wait = (sec) => {
+    return new Promise(resolv => {
+        setTimeout(resolv, sec)
+    })
 }

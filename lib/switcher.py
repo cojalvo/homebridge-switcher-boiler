@@ -38,12 +38,12 @@ def is_port_in_use(p):
             return True
 
 
-while i == 0:
-    if is_port_in_use(UDP_PORT):
-        continue
-    else:
-     i = 1
-
+# while i == 0:
+#     if is_port_in_use(UDP_PORT):
+#         continue
+#     else:
+#      i = 1
+#
 
 if sys.argv[1] == "discover":
     sCommand = "3"
