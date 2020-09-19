@@ -37,16 +37,16 @@
   },
   "funding": [
     {
-      "type" : "paypal",
-      "url" : "https://paypal.me/nitaybz"
+      "type": "paypal",
+      "url": "https://paypal.me/nitaybz"
     },
     {
-      "type" : "patreon",
-      "url" : "https://www.patreon.com/nitaybz"
+      "type": "patreon",
+      "url": "https://www.patreon.com/nitaybz"
     },
     {
-      "type" : "kofi",
-      "url" : "https://ko-fi.com/nitaybz"
+      "type": "kofi",
+      "url": "https://ko-fi.com/nitaybz"
     }
   ]
 }
