@@ -115,7 +115,7 @@ function SwitcherBoiler(log, config, api) {
         if (this.debug)
             this.log('Getting Switcher State (interval)');
         try {
-            const newState = await SwitcherApi.getState();
+            const newState = await SwitcherApi.getState(this.cachedConfig.deviceIP, this.cachedConfig.deviceID);
             this.timer = newState.autoShutdownMs / 1000;
             this.remainingDuration = newState.timeLeftMs / 1000;
             if (this.debug) {
@@ -135,7 +135,7 @@ function SwitcherBoiler(log, config, api) {
         this.interval = setInterval(this.refreshState, this.pollingInterval);
         let on = this.state.power === 'on' ? 1 : 0;
         try {
-            const newState = await SwitcherApi.getState();
+            const newState = await SwitcherApi.getState(this.cachedConfig.deviceIP, this.cachedConfig.deviceID);
             errorRepeatCounter = 0;
             this.timer = newState.autoShutdownMs / 1000;
             this.remainingDuration = newState.timeLeftMs / 1000;
@@ -390,7 +390,7 @@ SwitcherBoiler.prototype.setOn = async function (on, callback) {
         this.log('Turning OFF the Switcher');
 
     try {
-        await SwitcherApi.setState(on);
+        await SwitcherApi.setState(on, this.cachedConfig.deviceIP, this.cachedConfig.deviceID);
 
         this.updateState()
     } catch (err) {
@@ -401,7 +401,7 @@ SwitcherBoiler.prototype.setOn = async function (on, callback) {
             setTimeout(async () => {
                 try {
                     this.log('Trying again...');
-                    await SwitcherApi.setState(on);
+                    await SwitcherApi.setState(on, this.cachedConfig.deviceIP, this.cachedConfig.deviceID);
                     this.updateState()
                 } catch (err) {
                     this.log('ERROR Turning ' + (on ? 'ON' : 'OFF') + ' the Switcher');
@@ -436,7 +436,7 @@ SwitcherBoiler.prototype.setDuration = async function (time, callback) {
     callback(null);
 
     try {
-        await SwitcherApi.setDuration(formattedTime);
+        await SwitcherApi.setDuration(formattedTime, this.cachedConfig.deviceIP, this.cachedConfig.deviceID);
         this.state.autoShutdownMs = time * 1000
     } catch (err) {
         this.log('ERROR Setting \"Auto Shutdown\" time');
@@ -446,7 +446,7 @@ SwitcherBoiler.prototype.setDuration = async function (time, callback) {
             setTimeout(async () => {
                 try {
                     this.log('Trying again...');
-                    await SwitcherApi.setDuration(formattedTime)
+                    await SwitcherApi.setDuration(formattedTime, this.cachedConfig.deviceIP, this.cachedConfig.deviceID)
                 } catch (err) {
                     this.log('ERROR Setting \"Auto Shutdown\" time');
                     this.log(err);
